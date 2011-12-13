@@ -1,0 +1,69 @@
+<strong>New Sales Call</strong> 
+
+<% remote_form_for @sales_call,
+		:url => {:action => :save_call, :id => @contact.id, :aid => @agent},
+		:update => 'calllist' do |f| %>
+  <%= f.error_messages %>
+<table>
+<tr>
+	<th>Media</th>
+	<th>Call Type</th>
+	<th>Outcome</th>
+	<th></th>
+	<% unless @contact.cid.nil? %>
+		<th>Purchase</th>
+	<% else %>
+		<th></th>
+	<% end %>
+</tr>
+<tr>
+	<td><%= select("post", :media, options_for_select([ "Phone", "Email", "WebSite" ], "Phone")) %></td>
+	<td><%= select("post", :call_type, options_for_select([ "ColdCall", "ReSell", "FollowUp", "CallBack" ], "New")) %></td>
+	<td><%= select("post", :outcome, options_for_select([  "Waiting", "WillReturnCall", "FollowUp", "Purchased", "Rejected", "DoNotCall" ], "FollowUp")) %></td>
+	<td><%= f.submit 'Save Call' %></td>
+	<% unless @contact.cid.nil? %>
+		<td align="center"><%= check_box_tag :cid, @contact.cid, checked = false  %></td>
+	<% else %>
+		<td><% remote_form_for @reg,
+		:url => {:action => :register, :id => @contact.id, :aid => @agent},
+		:update => 'contactlist' do |r| %>
+  		<%= r.submit 'Register' %>
+		<% end %></td>
+	<% end %>
+</tr>
+</table>
+Phone: <%=h @contact.phone%>
+<% unless @contact.fax.nil? %>
+	(fax: <%=h @contact.fax %>
+<% end %>)<br />
+Email: <%=h @contact.email%><hr />
+<%=h @contact.company %><br />
+<%=h @contact.firstname %> <%=h @contact.lastname %><br />
+<%=h @contact.address1 %><br />
+<% unless @contact.address2.nil? %>
+	<%=h @contact.address2 %><br />  
+<% end %>  
+<%=h @contact.city %>, <%=h @contact.state %> <%=h @contact.zipcode %> <%=h @contact.country %>
+<hr />
+  <p>
+    Sales Agent Id<br />
+    <%=h @agent.to_s %>
+  </p>
+  <p>
+    <%= f.label :pid, 'Purchase Order Id' %>(if created separately)<br />
+    <%= f.text_field :pid, :size => 15 %>
+  </p>
+  <p>
+    <%= f.label :follow_up, 'Follow up on' %><br /> 
+    <%= f.datetime_select :follow_up %>
+  </p>
+  <p><%= f.label :notes %><br />
+	    <%= f.text_area :notes, :rows => 6, :cols => 50 %></td>
+  </p>
+  <p><%= f.label :email_copy, "Copy of Email" %><br />
+    	<%= f.text_area :email_copy, :rows => 15, :cols => 50 %></td>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
